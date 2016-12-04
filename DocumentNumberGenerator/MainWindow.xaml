@@ -1,0 +1,67 @@
+﻿<Window x:Class="DocumentNumberGenerator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:validators="clr-namespace:DocumentNumberGenerator.Validators"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d"
+        Title="Document Generator" Height="350" Width="525">
+
+    <Grid>
+        <ProgressBar 
+                 Value="{Binding CurrentProgress, Mode=OneWay}" 
+                 Visibility="{Binding ProgressVisibility}" 
+                 Margin="22,29,30,225" />
+
+        <Button
+            Content="Start Now"  
+            Height="30" 
+            Width="80" 
+            HorizontalAlignment="Left" 
+            Margin="26,166,0,0" 
+            Name="BtnStartNow" 
+            VerticalAlignment="Top" 
+            Command="{Binding Path=InstigateWorkCommand}">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="IsEnabled" Value="false" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=TextBoxElementCount, Path=(Validation.HasError)}" Value="false" />
+                                    </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled" Value="true" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <TextBox 
+            x:Name="TextBox"
+            IsEnabled="false"
+            HorizontalAlignment="Left" 
+            Height="30" Margin="128,166,0,0"
+            TextWrapping="Wrap" Text="{Binding DatabseCountValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+            VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="DatabaseDataLabel" Content="Number of elements&#xD;&#xA;in DataBase&#xD;&#xA;" HorizontalAlignment="Left" Margin="128,124,0,0" VerticalAlignment="Top" Width="120" Height="42"/>
+        <TextBox 
+            x:Name="TextBoxElementCount"
+            IsEnabled="true"
+            HorizontalAlignment="Left" 
+            Height="30" Margin="26,124,0,0"
+            TextWrapping="Wrap"
+            VerticalAlignment="Top" Width="80">
+            <TextBox.Text>
+                <Binding Path="ElementsToFill" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <validators:OnlyNumbersValidationRule ValidatesOnTargetUpdated="True" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+    </Grid>
+
+</Window>
+
