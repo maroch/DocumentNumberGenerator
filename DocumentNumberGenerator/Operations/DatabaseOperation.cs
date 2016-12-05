@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 
@@ -196,7 +195,7 @@ namespace DocumentNumberGenerator.Operations
             catch (SQLiteException ex)
             {
                 throw new Exception($@"Some SQLiteException error: \n {ex.Message}%");
-               
+
             }
             catch (SqlException ex)
             {

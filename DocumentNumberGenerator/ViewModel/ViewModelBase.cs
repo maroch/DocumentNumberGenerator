@@ -2,30 +2,19 @@
 
 namespace DocumentNumberGenerator.ViewModel
 {
+    /// <summary>
+    /// Base View Model for all ViewModels
+    /// </summary>
     public abstract class ViewModelBase : INotifyPropertyChanging, INotifyPropertyChanged
     {
-        #region INotifyPropertyChanging Members
-
         public event PropertyChangingEventHandler PropertyChanging;
 
-        #endregion
-
-        #region INotifyPropertyChanged Members
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-        #region Administrative Properties
 
         /// <summary>
         /// Whether the view model should ignore property-change events.
         /// </summary>
         public virtual bool IgnorePropertyChangeEvents { get; set; }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Raises the PropertyChanged event.
@@ -60,7 +49,5 @@ namespace DocumentNumberGenerator.ViewModel
             var e = new PropertyChangingEventArgs(propertyName);
             PropertyChanging(this, e);
         }
-
-        #endregion
     }
 }

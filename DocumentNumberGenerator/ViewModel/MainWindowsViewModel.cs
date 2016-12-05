@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using DocumentNumberGenerator.Operations;
-using System.Data.SQLite;
-using System.Runtime.Remoting.Messaging;
 using DocumentNumberGenerator.Exceptions;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace DocumentNumberGenerator.ViewModel
 {
@@ -22,21 +18,25 @@ namespace DocumentNumberGenerator.ViewModel
     {
         private readonly BackgroundWorker _worker;
         private const int MinimumDocumentNumber = 10000000;
-        private const int MaximumDocumentNumber = 20000000;
-        private const int PackToSaveSize = 2000;
+        private const int MaximumDocumentNumber = 99000000;
+        private const int MaximumDocumentDatabaseSize = 10000000;
+        private const int PackToSaveSize = 20000;
         private decimal _currentProgress;
         private string _dataBaseSizeMessage;
         private int _elementsToFill = 1;
         private int _dataBaseStartSize = 0;
 
         /// <summary>
-        /// 
+        /// Start create documents numbers command
         /// </summary>
         public ICommand InstigateWorkCommand { get; }
 
+        /// <summary>
+        /// Bounded current process ProgressBar value
+        /// </summary>
         public decimal CurrentProgress
         {
-            get { return Math.Round(_currentProgress,0); }
+            get { return _currentProgress; }
             private set
             {
                 if (_currentProgress != value)
@@ -61,6 +61,9 @@ namespace DocumentNumberGenerator.ViewModel
             }
         }
 
+        /// <summary>
+        /// NUmber of document numbers requested to create
+        /// </summary>
         public int ElementsToFill
         {
             get { return _elementsToFill; }
@@ -83,7 +86,7 @@ namespace DocumentNumberGenerator.ViewModel
             _worker.RunWorkerCompleted += EndFillDataBaseWork;
             _worker.ProgressChanged += ProgressChanged;
             _dataBaseStartSize = DataBaseAccessFactory.GetDataBaseOperationClass().GetDataBaseCount();
-            DatabseCountValue = $"{_dataBaseStartSize}\t {Math.Round((double)_dataBaseStartSize / 100000, 2)}%";
+            DatabseCountValue = $"{_dataBaseStartSize}\t {Math.Round((double)_dataBaseStartSize / (MaximumDocumentDatabaseSize/100), 2)}%";
         }
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -95,14 +98,14 @@ namespace DocumentNumberGenerator.ViewModel
         {
             try
             {
-                var timeElapsed = FillDataTableRecursive( MinimumDocumentNumber, MaximumDocumentNumber,
+                var timeElapsed = FillDataTableRecursive(MinimumDocumentNumber, MaximumDocumentNumber,
                     _elementsToFill);
                 MessageBox.Show($"Work Time: {timeElapsed.ToString()}msec", caption: "Operation completed !!!",
                     button: MessageBoxButton.OK, icon: MessageBoxImage.Information);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, caption: "Operation completed !!!",
+                MessageBox.Show(ex.Message, caption: "Operation Error !!!",
                   button: MessageBoxButton.OK, icon: MessageBoxImage.Error);
 
             }
@@ -132,35 +135,35 @@ namespace DocumentNumberGenerator.ViewModel
         {
             try
             {
-                if(fillSize >= MaximumDocumentNumber || fillSize<=0)
-                    throw new DocumentNumberGeneratorLogicException($"Range of documents can be from 0 to {MaximumDocumentNumber-MinimumDocumentNumber}");
+                if (fillSize >= MaximumDocumentDatabaseSize || fillSize <= 0)
+                    throw new DocumentNumberGeneratorLogicException($"Range of documents can be from 0 to {MaximumDocumentNumber - MinimumDocumentNumber}");
                 var watch = Stopwatch.StartNew();
                 var maxNumbers = fillSize;
-                var numbers = new List<int>(maxNumbers);    
+                var numbers = new List<int>(maxNumbers);
                 var r = new Random();
                 //count of document in database in processed range
                 var allStuff = DataBaseAccessFactory.GetDataBaseOperationClass()
                     .GetDataBaseCount(minimumNumber, biggestNumber);
                 //number of documents in first half of processed range
                 var firstPartStuff = DataBaseAccessFactory.GetDataBaseOperationClass()
-                    .GetDataBaseCount(minimumNumber, ((biggestNumber + minimumNumber)/2));
+                    .GetDataBaseCount(minimumNumber, ((biggestNumber + minimumNumber) / 2));
+                var secondPartStuff = allStuff-firstPartStuff;
+                if (fillSize > MaximumDocumentDatabaseSize - allStuff)
+                    throw new DocumentNumberGeneratorLogicException($"Number of documents can be saved is {MaximumDocumentDatabaseSize - allStuff}");
 
-                if (fillSize > MaximumDocumentNumber - MinimumDocumentNumber - allStuff)
-                    throw new DocumentNumberGeneratorLogicException($"Number of documents can be saved is {MaximumDocumentNumber - MinimumDocumentNumber - allStuff}");
 
-
-                //Liner random variable give best range to serch random unige numbers, it seems to be 
+                //Linear random variable give best range to serch random unige numbers, it seems to be 
                 //minimum when full range recurse divided by 2 give minnimum  
-                if ((((biggestNumber - minimumNumber) - allStuff) > 2*fillSize))
+                if ((((biggestNumber - minimumNumber) - allStuff) > 2 * fillSize))
                 {
-                    if (firstPartStuff > allStuff - firstPartStuff)
+                    if (firstPartStuff > secondPartStuff )
                     {
-                        return FillDataTableRecursive((biggestNumber + minimumNumber)/2, biggestNumber,
+                        return FillDataTableRecursive((biggestNumber + minimumNumber) / 2, biggestNumber,
                             fillSize);
                     }
                     else
                     {
-                        return FillDataTableRecursive( minimumNumber, ((biggestNumber + minimumNumber)/2),
+                        return FillDataTableRecursive(minimumNumber, ((biggestNumber + minimumNumber) / 2),
                             fillSize);
                     }
                 }
@@ -187,8 +190,8 @@ namespace DocumentNumberGenerator.ViewModel
                             DataBaseAccessFactory.GetDataBaseOperationClass().FillDataTable(numbers);
                         _dataBaseStartSize += countInsertedValues;
                         maxNumbers -= countInsertedValues;
-                        CurrentProgress += Decimal.Divide(100*(countInsertedValues), (_elementsToFill));
-                        DatabseCountValue = $"{_dataBaseStartSize}\t{Math.Round((double)(_dataBaseStartSize)/((MaximumDocumentNumber-MinimumDocumentNumber)/100), 2)}%";
+                        CurrentProgress += (decimal)(100 * (countInsertedValues))/_elementsToFill;
+                        DatabseCountValue = $"{_dataBaseStartSize}\t{Math.Round((double)(_dataBaseStartSize) / ((MaximumDocumentDatabaseSize) / 100), 2)}%";
 
                         numbers.Clear();
                         if (maxNumbers > 0)
@@ -212,6 +215,5 @@ namespace DocumentNumberGenerator.ViewModel
 
             }
         }
-
     }
 }

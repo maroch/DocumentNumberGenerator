@@ -30,7 +30,7 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding ElementName=TextBoxElementCount, Path=(Validation.HasError)}" Value="false" />
-                                    </MultiDataTrigger.Conditions>
+                            </MultiDataTrigger.Conditions>
                             <Setter Property="IsEnabled" Value="true" />
                         </MultiDataTrigger>
                     </Style.Triggers>
