@@ -8,18 +8,18 @@
         mc:Ignorable="d"
         Title="Document Generator" Height="350" Width="525">
 
-    <Grid>
+    <Grid Margin="0,0,0,-1">
         <ProgressBar 
                  Value="{Binding CurrentProgress, Mode=OneWay}" 
                  Visibility="{Binding ProgressVisibility}" 
-                 Margin="22,29,30,225" />
+                 Margin="26,47,26,207" />
 
         <Button
             Content="Start Now"  
-            Height="30" 
+            Height="56" 
             Width="80" 
             HorizontalAlignment="Left" 
-            Margin="26,166,0,0" 
+            Margin="26,140,0,0" 
             Name="BtnStartNow" 
             VerticalAlignment="Top" 
             Command="{Binding Path=InstigateWorkCommand}">
@@ -41,15 +41,15 @@
             x:Name="TextBox"
             IsEnabled="false"
             HorizontalAlignment="Left" 
-            Height="30" Margin="128,166,0,0"
+            Height="30" Margin="340,166,0,0"
             TextWrapping="Wrap" Text="{Binding DatabseCountValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
             VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="DatabaseDataLabel" Content="Number of elements&#xD;&#xA;in DataBase&#xD;&#xA;" HorizontalAlignment="Left" Margin="128,124,0,0" VerticalAlignment="Top" Width="120" Height="42"/>
+        <Label x:Name="DatabaseDataLabel" Content="Number of elements&#xD;&#xA;in DataBase&#xD;&#xA;" HorizontalAlignment="Left" Margin="340,112,0,0" VerticalAlignment="Top" Width="120" Height="42"/>
         <TextBox 
             x:Name="TextBoxElementCount"
             IsEnabled="true"
             HorizontalAlignment="Left" 
-            Height="30" Margin="26,124,0,0"
+            Height="30" Margin="126,166,0,0"
             TextWrapping="Wrap"
             VerticalAlignment="Top" Width="80">
             <TextBox.Text>
@@ -60,6 +60,8 @@
                 </Binding>
             </TextBox.Text>
         </TextBox>
+        <Label x:Name="QuantityOfNumber" Content="Numbers Quantity&#xA;" HorizontalAlignment="Left" Margin="112,127,0,0" VerticalAlignment="Top" Width="120" Height="34" RenderTransformOrigin="-1.525,-1.345"/>
+        <Label x:Name="QuantityOfNumber_Copy" Content="PROGRESS:" HorizontalAlignment="Left" Margin="26,13,0,0" VerticalAlignment="Top" Width="120" Height="34" RenderTransformOrigin="-1.525,-1.345"/>
 
     </Grid>
 
