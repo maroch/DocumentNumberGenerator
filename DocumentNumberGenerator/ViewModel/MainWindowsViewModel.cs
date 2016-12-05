@@ -144,16 +144,18 @@ namespace DocumentNumberGenerator.ViewModel
                 //count of document in database in processed range
                 var allStuff = DataBaseAccessFactory.GetDataBaseOperationClass()
                     .GetDataBaseCount(minimumNumber, biggestNumber);
-                //number of documents in first half of processed range
+                //size of unique numbers in first half of processed range
                 var firstPartStuff = DataBaseAccessFactory.GetDataBaseOperationClass()
                     .GetDataBaseCount(minimumNumber, ((biggestNumber + minimumNumber) / 2));
+                //size of unique numbers in second half of processed range
                 var secondPartStuff = allStuff-firstPartStuff;
                 if (fillSize > MaximumDocumentDatabaseSize - allStuff)
                     throw new DocumentNumberGeneratorLogicException($"Number of documents can be saved is {MaximumDocumentDatabaseSize - allStuff}");
 
 
-                //Linear random variable give best range to serch random unige numbers, it seems to be 
-                //minimum when full range recurse divided by 2 give minnimum  
+                //if the range of possible use of the unique number is twice the amount 
+                //of numbers you want to generate this range can be divided into two, 
+                //choose a larger scope and cause recursive
                 if ((((biggestNumber - minimumNumber) - allStuff) > 2 * fillSize))
                 {
                     if (firstPartStuff > secondPartStuff )
